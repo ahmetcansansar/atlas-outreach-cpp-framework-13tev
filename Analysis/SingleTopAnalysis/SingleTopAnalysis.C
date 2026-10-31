@@ -75,6 +75,8 @@ Bool_t SingleTopAnalysis::Process(Long64_t entry)
     
       // Make difference between data and MC
       if(option.Contains("data")) {  weight = 1.; }  
+
+      hist_cutflow_unw->Fill(0.); hist_cutflow_w->Fill(0., weight); // cutflow 0: all events
       
       // Missing Et of the event in GeV
       Float_t missingEt = met_et;
@@ -82,10 +84,12 @@ Bool_t SingleTopAnalysis::Process(Long64_t entry)
       //First cut : missing energy larger than 30 GeV
       if(missingEt > 30000)
 	{
+	  hist_cutflow_unw->Fill(1); hist_cutflow_w->Fill(1, weight); // cutflow 1: MET > 30 GeV
 	  
 	  // Preselection cut for electron/muon trigger
 	  if(trigE || trigM)
 	    {
+	      hist_cutflow_unw->Fill(2); hist_cutflow_w->Fill(2, weight); // cutflow 2: electron or muon trigger
 	      
 	      // Preselection of good leptons
 	      int goodlep_index = 0;
@@ -132,6 +136,7 @@ Bool_t SingleTopAnalysis::Process(Long64_t entry)
 	      //Exactly one good lepton
 	      if(goodlep_n==1)
 		{
+		  hist_cutflow_unw->Fill(3); hist_cutflow_w->Fill(3, weight); // cutflow 3: exactly one good lepton
 		  
 		  //Preselection of good jets
 		  int goodjet_n = 0;
@@ -183,10 +188,12 @@ Bool_t SingleTopAnalysis::Process(Long64_t entry)
                   //transverse mass larger than 60 GeV
 		  if(mtw > 60000.)
 		    {
+		      hist_cutflow_unw->Fill(4); hist_cutflow_w->Fill(4, weight); // cutflow 4: mTW > 60 GeV
 		      
                       // exactly two good jets
                       if(goodjet_n == 2)
                         {
+                          hist_cutflow_unw->Fill(5); hist_cutflow_w->Fill(5, weight); // cutflow 5: exactly 2 good jets
 			  
                           int goodjet1_index = goodjet_index[0]; // leading jet
                           int goodjet2_index = goodjet_index[1]; // second jet
@@ -194,6 +201,7 @@ Bool_t SingleTopAnalysis::Process(Long64_t entry)
                           //exactly one b-tagged jets
                           if(goodbjet_n == 1)
                             {
+                              hist_cutflow_unw->Fill(6); hist_cutflow_w->Fill(6, weight); // cutflow 6: exactly 1 b-tagged jet
                               int taggedjet_index = goodbjet_index[0]; // b-jet
                               int untagged_index = -999;
 			      if (goodjet1_index==taggedjet_index) untagged_index =goodjet2_index; 
@@ -202,16 +210,19 @@ Bool_t SingleTopAnalysis::Process(Long64_t entry)
                               //the spectator quark tends to be produced in the forward direction in the t-channel process.
 			      if ( TMath::Abs(jet_eta->at(untagged_index)) > 1.5 ) 
   			        {
+  			          hist_cutflow_unw->Fill(7); hist_cutflow_w->Fill(7, weight); // cutflow 7: |eta| of untagged jet > 1.5
 				  
 				  //separation in  between the untagged jet and the b-tagged jet must be larger than 1.5, to reduce the contribution from tt background events.
 				  float deltaeta = TMath::Abs( jet_eta->at(untagged_index) - jet_eta->at(taggedjet_index) );		
 				  if (deltaeta > 1.5)
 				    {
+				      hist_cutflow_unw->Fill(8); hist_cutflow_w->Fill(8, weight); // cutflow 8: delta-eta(untagged jet, b-jet) > 1.5
 				      
 				      //The scalar sum of the pT of the lepton, the pT of the jets and MET  must be larger than 195 GeV
 				      float HT = Lepton_1.Pt()/1000. +  jet_pt->at(untagged_index)/1000. + jet_pt->at(taggedjet_index)/1000. + missingEt/1000.;
 				      if (HT > 195)
 					{
+					  hist_cutflow_unw->Fill(9); hist_cutflow_w->Fill(9, weight); // cutflow 9: HT > 195 GeV
 					  // mass of reconstructed top quark (lepton, neutrino, b) cut
 					  TLorentzVector bjet  = TLorentzVector(); bjet.SetPtEtaPhiE(jet_pt->at(taggedjet_index), jet_eta->at(taggedjet_index), jet_phi->at(taggedjet_index),jet_E->at(taggedjet_index));
 					  
@@ -219,6 +230,7 @@ Bool_t SingleTopAnalysis::Process(Long64_t entry)
 					  
 					  if (Mlb < 150)
 					    {	
+					      hist_cutflow_unw->Fill(10); hist_cutflow_w->Fill(10, weight); // cutflow 10: m(lb) < 150 GeV
 					      
 					      
 					      //Start to fill histograms : definitions of x-axis variables

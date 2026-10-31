@@ -17,6 +17,10 @@ class SingleTopAnalysis : public TSelector {
   //////////////////////////////////////////////////////////
   // histograms
 
+  // Cutflow - addition for validation workflow
+  TH1D *hist_cutflow_unw = 0;
+  TH1D *hist_cutflow_w   = 0;
+
   // Global histograms
   TH1F *hist_etmiss   = 0;
   TH1F *hist_mtw      = 0;

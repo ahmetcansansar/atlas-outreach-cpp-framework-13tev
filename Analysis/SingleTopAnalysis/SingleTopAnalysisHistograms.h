@@ -8,6 +8,10 @@
 void SingleTopAnalysis::define_histograms()
 {
   // HISTOGRAMS
+  
+  // Cutflow - addition for validation workflow
+  hist_cutflow_unw      = new TH1D("hist_cutflow_unw",  "Cutflow of event counts (unweighted)", 20, 0, 20);
+  hist_cutflow_w      = new TH1D("hist_cutflow_w",  "Cutflow of event counts (weighted)", 20, 0, 20);
 
   // Global histograms
   hist_etmiss       = new TH1F("hist_etmiss",      "Missing Transverse Momentum;E_{T}^{miss} [GeV];Events / bin", 20, 0, 200);
@@ -43,6 +47,10 @@ void SingleTopAnalysis::define_histograms()
 ////////////////////////////////////////////////////////////////////////////////
 void SingleTopAnalysis::FillOutputList()
 {
+  // Cutflow - addition for validation workflow
+  GetOutputList()->Add(hist_cutflow_unw);
+  GetOutputList()->Add(hist_cutflow_w);
+
   // histograms
 
   // Add Global histograms
@@ -78,6 +86,10 @@ void SingleTopAnalysis::FillOutputList()
 ////////////////////////////////////////////////////////////////////////////////
 void SingleTopAnalysis::WriteHistograms()
 {
+  // Cutflow - addition for validation workflow
+  hist_cutflow_unw->Write();
+  hist_cutflow_w->Write();
+
   // histograms
 
   // Write Global histograms
