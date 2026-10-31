@@ -70,14 +70,17 @@ Bool_t ZZDiBosonAnalysis::Process(Long64_t entry)
 
       // Make difference between data and MC
       if(option.Contains("data")) {  weight = 1.; }
+      hist_cutflow_unw->Fill(0.); hist_cutflow_w->Fill(0., weight); // cutflow 0: all events
 
       // inmediate cut on the number of leptons
       if(lep_n>=4)
       {
+      hist_cutflow_unw->Fill(1); hist_cutflow_w->Fill(1, weight); // cutflow 1: at least four leptons
 
       //Preselection cut for electron/muon trigger
       if(trigE || trigM)
 	{
+	  hist_cutflow_unw->Fill(2); hist_cutflow_w->Fill(2, weight); // cutflow 2: trigger
 	  
 	  // Preselection of good leptons
 	  int goodlep_index[4];
@@ -117,6 +120,7 @@ Bool_t ZZDiBosonAnalysis::Process(Long64_t entry)
 	  //Exactly four good leptons
 	  if(goodlep_n==4 )
 	    {
+	      hist_cutflow_unw->Fill(3); hist_cutflow_w->Fill(3, weight); // cutflow 3: exactly four good leptons
 	      
 	      int goodlep1_index = goodlep_index[0];
 	      int goodlep2_index = goodlep_index[1];
@@ -158,6 +162,7 @@ Bool_t ZZDiBosonAnalysis::Process(Long64_t entry)
 	      // opposite charge leptons
 	      if ( sum_charges == 0  ) 
 		{
+		  hist_cutflow_unw->Fill(4); hist_cutflow_w->Fill(4, weight); // cutflow 4: total charge zero
 		  
 		  int sum_types  = lep_type->at(goodlep1_index) + lep_type->at(goodlep2_index) + lep_type->at(goodlep3_index) + lep_type->at(goodlep4_index) ;
 		  
@@ -250,10 +255,12 @@ Bool_t ZZDiBosonAnalysis::Process(Long64_t entry)
                   // at least one lepton with pT > 25 GeV 
 		  if( lep_pt->at(goodlep1_index)/1000. > 25 || lep_pt->at(goodlep2_index)/1000. > 25 || lep_pt->at(goodlep3_index)/1000. > 25 || lep_pt->at(goodlep4_index)/1000. > 25 )
 		  {
+		  hist_cutflow_unw->Fill(5); hist_cutflow_w->Fill(5, weight); // cutflow 5: at least one lepton with pT > 25 GeV
 
 		  // final selection, each lepton pair must have an invariant mass in the range 66–116 GeV, sum of differences < 50 GeV
 		  if ( (sum_types == 44 || sum_types == 52 || sum_types == 48) && sum_ZZ_fin < 50 )
 		    {
+		      hist_cutflow_unw->Fill(6); hist_cutflow_w->Fill(6, weight); // cutflow 6: valid eeee/mumumumu/eemumu and sum of |m_ll - mZ| < 50 GeV
 		     		      
 		      TLorentzVector FourLepSystem = TLorentzVector();
 		      FourLepSystem = Lepton_1 + Lepton_2 + Lepton_3 + Lepton_4;

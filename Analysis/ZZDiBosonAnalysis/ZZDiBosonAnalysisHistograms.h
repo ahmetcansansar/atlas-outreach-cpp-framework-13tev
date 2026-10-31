@@ -9,6 +9,10 @@ void ZZDiBosonAnalysis::define_histograms()
 {
   // HISTOGRAMS
 
+  // Cutflow - addition for validation workflow
+  hist_cutflow_unw      = new TH1D("hist_cutflow_unw",  "Cutflow of event counts (unweighted)", 10, 0, 10);
+  hist_cutflow_w      = new TH1D("hist_cutflow_w",  "Cutflow of event counts (weighted)", 10, 0, 10);
+
   // Global histograms variables
   hist_mLL1         = new TH1F("hist_mLL1",        "Mass of Dilepton System; m_{ll,1} [GeV];Events / bin", 18, 64, 118);
   hist_mLL2         = new TH1F("hist_mLL2",        "Mass of Dilepton System; m_{ll,2} [GeV];Events / bin", 18, 64, 118);
@@ -36,6 +40,10 @@ void ZZDiBosonAnalysis::FillOutputList()
 {
   // histograms
 
+  // Cutflow - addition for validation workflow
+  GetOutputList()->Add(hist_cutflow_unw);
+  GetOutputList()->Add(hist_cutflow_w);
+
   // Add Global histograms
   GetOutputList()->Add(hist_mLL1);
   GetOutputList()->Add(hist_mLL2);
@@ -60,6 +68,10 @@ void ZZDiBosonAnalysis::FillOutputList()
 ////////////////////////////////////////////////////////////////////////////////
 void ZZDiBosonAnalysis::WriteHistograms()
 {
+  // Cutflow - addition for validation workflow
+  hist_cutflow_unw->Write();
+  hist_cutflow_w->Write();
+
   // histograms
 
   // Write Global histograms
