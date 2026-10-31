@@ -71,11 +71,13 @@ Bool_t WZDiBosonAnalysis::Process(Long64_t entry)
 
       // Make difference between data and MC
       if(option.Contains("data")) {  weight = 1.; }
+      hist_cutflow_unw->Fill(0.); hist_cutflow_w->Fill(0., weight); // cutflow 0: all events
 
       
       //Preselection cut for electron/muon trigger 
       if(trigE || trigM)
 	{
+	  hist_cutflow_unw->Fill(1); hist_cutflow_w->Fill(1, weight); // cutflow 1: trigger
 	  
 	  // Preselection of good leptons
 	  int goodlep_index[3];
@@ -116,6 +118,7 @@ Bool_t WZDiBosonAnalysis::Process(Long64_t entry)
 	  //Exactly three good leptons
 	  if(goodlep_n==3 )
 	    {
+	      hist_cutflow_unw->Fill(2); hist_cutflow_w->Fill(2, weight); // cutflow 2: exactly three good leptons
 	      
 	      int goodlep1_index = goodlep_index[0];
 	      int goodlep2_index = goodlep_index[1];
@@ -243,9 +246,11 @@ Bool_t WZDiBosonAnalysis::Process(Long64_t entry)
 	      // cut: m_ll - m(Z) < 10
 	      if(tmp < 10.)
 		{
+		  hist_cutflow_unw->Fill(3); hist_cutflow_w->Fill(3, weight); // cutflow 3: |m_ll - mZ| < 10 GeV (Z candidate)
 		  // mtw > 30 GeV, at least one lepton with pT > 25 GeV 
 		  if( mtw > 30000. && met_et > 30000. && (lep_pt->at(goodlep1_index)/1000. > 25 || lep_pt->at(goodlep2_index)/1000. > 25 || lep_pt->at(goodlep3_index)/1000. > 25) )
 		  {
+		      hist_cutflow_unw->Fill(4); hist_cutflow_w->Fill(4, weight); // cutflow 4: mtw > 30 GeV, MET > 30 GeV, at least one lepton with pT > 25 GeV
 		      
 		      //Start to fill histograms : definitions of x-axis variables
 		      
