@@ -75,6 +75,7 @@ Bool_t WBosonAnalysis::Process(Long64_t entry)
       
       // Make difference between data and MC
       if(option.Contains("data")) {  weight = 1.; }  
+      hist_cutflow_unw->Fill(0.); hist_cutflow_w->Fill(0., weight); // cutflow 0: all events
       
       // Missing Et of the event in GeV
       Float_t missingEt = met_et;
@@ -82,10 +83,12 @@ Bool_t WBosonAnalysis::Process(Long64_t entry)
       //First cut : missing energy larger than 30 GeV
       if(missingEt > 30000)
 	{
+	  hist_cutflow_unw->Fill(1); hist_cutflow_w->Fill(1, weight); // cutflow 1: MET > 30 GeV
 	  
 	  // Preselection cut for electron/muon trigger
 	  if(trigE || trigM)
 	    {
+	      hist_cutflow_unw->Fill(2); hist_cutflow_w->Fill(2, weight); // cutflow 2: trigger
 	      
 	      // Preselection of good leptons
 	      int goodlep_index = 0;
@@ -132,6 +135,7 @@ Bool_t WBosonAnalysis::Process(Long64_t entry)
              //Exactly one good lepton
 	      if(goodlep_n==1)
 		{
+		  hist_cutflow_unw->Fill(3); hist_cutflow_w->Fill(3, weight); // cutflow 3: exactly one good lepton
 		  
 		  // TLorentzVector definitions
 		  TLorentzVector Lepton_1  = TLorentzVector();
@@ -152,6 +156,7 @@ Bool_t WBosonAnalysis::Process(Long64_t entry)
 		  //transverse mass larger than 60 GeV
 		  if(mtw > 60000.)
 		    {
+			  hist_cutflow_unw->Fill(4); hist_cutflow_w->Fill(4, weight); // cutflow 4: mtw > 60 GeV
                      
 			  //Start to fill histograms : definitions of x-axis variables
 			  double names_of_global_variable[]={missingEt/1000., mtw/1000. , mtw_enu/1000., mtw_munu/1000.};

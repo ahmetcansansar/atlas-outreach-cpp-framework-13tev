@@ -9,6 +9,10 @@ void WBosonAnalysis::define_histograms()
 {
   // HISTOGRAMS
 
+  // Cutflow - addition for validation workflow
+  hist_cutflow_unw      = new TH1D("hist_cutflow_unw",  "Cutflow of event counts (unweighted)", 10, 0, 10);
+  hist_cutflow_w      = new TH1D("hist_cutflow_w",  "Cutflow of event counts (weighted)", 10, 0, 10);
+
   //Global variables
   hist_etmiss       = new TH1F("hist_etmiss",       "Missing Transverse Momentum;E_{T}^{miss} [GeV];Events / bin", 30, 0, 200);
   hist_mtw          = new TH1F("hist_mtw",          "Transverse Mass; M^{W}_{T} [GeV];Events / bin", 40, 39, 180);
@@ -39,6 +43,10 @@ void WBosonAnalysis::FillOutputList()
 {
   // histograms
 
+  // Cutflow - addition for validation workflow
+  GetOutputList()->Add(hist_cutflow_unw);
+  GetOutputList()->Add(hist_cutflow_w);
+
   // Add Global histograms
   GetOutputList()->Add(hist_etmiss);
   GetOutputList()->Add(hist_mtw);  GetOutputList()->Add(hist_mtw_enu);  GetOutputList()->Add(hist_mtw_munu);
@@ -64,6 +72,10 @@ void WBosonAnalysis::FillOutputList()
 ////////////////////////////////////////////////////////////////////////////////
 void WBosonAnalysis::WriteHistograms()
 {
+  // Cutflow - addition for validation workflow
+  hist_cutflow_unw->Write();
+  hist_cutflow_w->Write();
+
   // histograms
 
   // Write Global histograms
