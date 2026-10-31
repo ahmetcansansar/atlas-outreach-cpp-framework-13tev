@@ -8,6 +8,11 @@
 void SUSYAnalysis::define_histograms(vector<TString> channels)
 {
   // HISTOGRAMS
+
+  // Cutflow - addition for validation workflow
+  hist_cutflow_unw      = new TH1D("hist_cutflow_unw",  "Cutflow of event counts (unweighted)", 20, 0, 20);
+  hist_cutflow_w      = new TH1D("hist_cutflow_w",  "Cutflow of event counts (weighted)", 20, 0, 20);
+
   // Global histograms
   for(const auto & ch:channels){
     hist_mLL[ch]    = new TH1F("hist_mLL_"+ch,    "Mass of Dilepton System; m_{ll} [GeV];Events / bin", 20, 0, 500);
@@ -36,6 +41,10 @@ void SUSYAnalysis::define_histograms(vector<TString> channels)
 ////////////////////////////////////////////////////////////////////////////////
 void SUSYAnalysis::FillOutputList(vector<TString> channels)
 {
+  // Cutflow - addition for validation workflow
+  GetOutputList()->Add(hist_cutflow_unw);
+  GetOutputList()->Add(hist_cutflow_w);
+
   // histograms
   for(const auto & chn:channels){
     // Add Global histograms
@@ -64,6 +73,10 @@ void SUSYAnalysis::FillOutputList(vector<TString> channels)
 ////////////////////////////////////////////////////////////////////////////////
 void SUSYAnalysis::WriteHistograms(vector<TString> channels)
 {
+  // Cutflow - addition for validation workflow
+  hist_cutflow_unw->Write();
+  hist_cutflow_w->Write();
+
   // histograms
   TString histname; 
 

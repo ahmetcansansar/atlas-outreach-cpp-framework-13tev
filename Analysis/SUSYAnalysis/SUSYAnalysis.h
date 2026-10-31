@@ -26,6 +26,10 @@ public :
    //////////////////////////////////////////////////////////
    // histograms
 
+   // Cutflow - addition for validation workflow
+   TH1D *hist_cutflow_unw = 0;
+   TH1D *hist_cutflow_w   = 0;
+
    map<TString, TH1*> hist_etmiss; //!	 
    map<TString, TH1*> hist_mLL; //!	 
    map<TString, TH1*> hist_mt2; //! 

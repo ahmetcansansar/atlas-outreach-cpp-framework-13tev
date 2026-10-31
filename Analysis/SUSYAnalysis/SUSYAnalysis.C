@@ -80,7 +80,31 @@ Bool_t SUSYAnalysis::Process(Long64_t entry)
     // Event selection & Kinematics //
     //------------------------------//
 
+    // Event weighting moved before the selection - addition for validation workflow (no change in values)
+    //-----------------// 
+    // Event weighting // 
+    //-----------------//    
+
+    // Scale factors  
+    Float_t scaleFactor = scaleFactor_ELE*scaleFactor_MUON*scaleFactor_LepTRIGGER*scaleFactor_PILEUP;
+
+    //MC weight
+    Float_t m_mcWeight = mcWeight;
+
+    // read input option
+    if(option.Contains("single")) { m_mcWeight = (mcWeight/TMath::Abs(mcWeight)); } // set to 1 or -1 for single top MCs
+
+    //Total weight
+    Float_t weight = scaleFactor*m_mcWeight;
+
+    // Make difference between data and MC
+    option = GetOption(); 
+    if(option.Contains("data")) {  weight = 1.; }
+
+    hist_cutflow_unw->Fill(0.); hist_cutflow_w->Fill(0., weight); // cutflow 0: all events
+
     if(lep_n<2) return kTRUE; // Immediately get rid of events with <2 leptons 
+    hist_cutflow_unw->Fill(1); hist_cutflow_w->Fill(1, weight); // cutflow 1: at least 2 leptons
 
     int n_lep = 0;
     int n_lepbase = 0;
@@ -154,12 +178,15 @@ Bool_t SUSYAnalysis::Process(Long64_t entry)
     }
 
     if( n_lep != 2 ) return kTRUE; // Select only events with two good lepton candidates  
+    hist_cutflow_unw->Fill(2); hist_cutflow_w->Fill(2, weight); // cutflow 2: exactly 2 good leptons
 
     int l1_i = lep_indices.at(0); // Index of first lepton  
     int l2_i = lep_indices.at(1); // Index of second lepton 
 
     if(lep_type->at(l1_i) != lep_type->at(l2_i)) return kTRUE; // Same flavour
+    hist_cutflow_unw->Fill(3); hist_cutflow_w->Fill(3, weight); // cutflow 3: same flavour
     if(lep_charge->at(l1_i) == lep_charge->at(l2_i)) return kTRUE; // Opposite charge  
+    hist_cutflow_unw->Fill(4); hist_cutflow_w->Fill(4, weight); // cutflow 4: opposite charge
 
     // Set Lorentz vectors (l1 = leading lepton, l2 = subleading lepton) 
     TLorentzVector l1, l2; 
@@ -173,7 +200,9 @@ Bool_t SUSYAnalysis::Process(Long64_t entry)
 
     // Lepton pT cut 
     if(l1.Pt() < 25) return kTRUE; 
+    hist_cutflow_unw->Fill(5); hist_cutflow_w->Fill(5, weight); // cutflow 5: leading lepton pT >= 25 GeV
     if(l2.Pt() < 20) return kTRUE; 
+    hist_cutflow_unw->Fill(6); hist_cutflow_w->Fill(6, weight); // cutflow 6: subleading lepton pT >= 20 GeV
 
     // Identify the leptons 
     if(TMath::Abs((int)lep_type->at(l1_i))==11){ leptons = "ee";} // Electrons  
@@ -193,11 +222,13 @@ Bool_t SUSYAnalysis::Process(Long64_t entry)
       // Muon trigger 
       if(trigM != 1){return kTRUE;}
     }
+    hist_cutflow_unw->Fill(7); hist_cutflow_w->Fill(7, weight); // cutflow 7: flavour-dependent |eta| (ee: <= 2.47, mumu: <= 2.4) and trigger (ee: trigE, mumu: trigM)
        
     // Invariant mass cut  
     TLorentzVector dileptons = l1 + l2; 
     float mLL = dileptons.M();
     if(mLL < 40) return kTRUE; // End of pre-selection 
+    hist_cutflow_unw->Fill(8); hist_cutflow_w->Fill(8, weight); // cutflow 8: mLL >= 40 GeV (end of pre-selection)
 
     if(leptons == "ee") current_channels.push_back("eeOS");
     if(leptons == "mumu") current_channels.push_back("mumuOS"); 
@@ -224,29 +255,10 @@ Bool_t SUSYAnalysis::Process(Long64_t entry)
 
     // Apply signal region definitions 
     if( n_light_jets_pt60 == 0 && n_bjets_pt20 == 0 ){ 
-      if( mLL > 111 && MT2 > 100 ){ current_channels.push_back("SR_loose");  } 
-      if( mLL > 300 && MT2 > 130 ){ current_channels.push_back("SR_tight");  } 
+      hist_cutflow_unw->Fill(9); hist_cutflow_w->Fill(9, weight); // cutflow 9: jet veto (no light jets pT>60 GeV, no b-jets pT>20 GeV)
+      if( mLL > 111 && MT2 > 100 ){ current_channels.push_back("SR_loose"); hist_cutflow_unw->Fill(10); hist_cutflow_w->Fill(10, weight); /* cutflow 10: SR_loose, mLL > 111 GeV and MT2 > 100 GeV */ } 
+      if( mLL > 300 && MT2 > 130 ){ current_channels.push_back("SR_tight"); hist_cutflow_unw->Fill(11); hist_cutflow_w->Fill(11, weight); /* cutflow 11: SR_tight, mLL > 300 GeV and MT2 > 130 GeV */ } 
     }
-
-    //-----------------// 
-    // Event weighting // 
-    //-----------------//    
-
-    // Scale factors  
-    Float_t scaleFactor = scaleFactor_ELE*scaleFactor_MUON*scaleFactor_LepTRIGGER*scaleFactor_PILEUP;
-
-    //MC weight
-    Float_t m_mcWeight = mcWeight;
-
-    // read input option
-    if(option.Contains("single")) { m_mcWeight = (mcWeight/TMath::Abs(mcWeight)); } // set to 1 or -1 for single top MCs
-
-    //Total weight
-    Float_t weight = scaleFactor*m_mcWeight;
-
-    // Make difference between data and MC
-    option = GetOption(); 
-    if(option.Contains("data")) {  weight = 1.; }
 
     //-----------------// 
     // Fill histograms //
