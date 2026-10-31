@@ -8,6 +8,10 @@
 void TTbarAnalysis::define_histograms()
 {
   // HISTOGRAMS
+  
+  // Cutflow - addition for validation workflow
+  hist_cutflow_unw      = new TH1D("hist_cutflow_unw",  "Cutflow of event counts (unweighted)", 10, 0, 10);
+  hist_cutflow_w      = new TH1D("hist_cutflow_w",  "Cutflow of event counts (weighted)", 10, 0, 10);
 
   // Global histograms
   hist_etmiss       = new TH1F("hist_etmiss",      "Missing Transverse Momentum;E_{T}^{miss} [GeV];Events / bin", 20, 0, 300);
@@ -51,6 +55,10 @@ void TTbarAnalysis::define_histograms()
 ////////////////////////////////////////////////////////////////////////////////
 void TTbarAnalysis::FillOutputList()
 {
+  // Cutflow - addition for validation workflow
+  GetOutputList()->Add(hist_cutflow_unw);
+  GetOutputList()->Add(hist_cutflow_w);
+
   // histograms
 
   // Add Global histograms
@@ -90,6 +98,10 @@ void TTbarAnalysis::FillOutputList()
 ////////////////////////////////////////////////////////////////////////////////
 void TTbarAnalysis::WriteHistograms()
 {
+  // Cutflow - addition for validation workflow
+  hist_cutflow_unw->Write();
+  hist_cutflow_w->Write();
+
   // histograms
 
   // Write Global histograms

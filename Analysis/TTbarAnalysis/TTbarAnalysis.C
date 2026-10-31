@@ -71,18 +71,23 @@ Bool_t TTbarAnalysis::Process(Long64_t entry)
 
       // Make difference between data and MC
       if(option.Contains("data")) {  weight = 1.; }
+
+      hist_cutflow_unw->Fill(0.); hist_cutflow_w->Fill(0., weight); // cutflow 0: all events
       
       // cut on at least 4 jets
       if (jet_n > 3)
 	{
+	  hist_cutflow_unw->Fill(1); hist_cutflow_w->Fill(1, weight); // cutflow 1: at least 4 jets (jet_n > 3)
 	  
 	  // MET > 30 GeV
 	  if(met_et > 30000.)
 	    {
+	      hist_cutflow_unw->Fill(2); hist_cutflow_w->Fill(2, weight); // cutflow 2: MET > 30 GeV
 	      
 	      // Preselection cut for electron/muon trigger, Good Run List, and good vertex
 	      if(trigE || trigM)
 		{
+		  hist_cutflow_unw->Fill(3); hist_cutflow_w->Fill(3, weight); // cutflow 3: electron or muon trigger
 		  
 		  // Preselection of good leptons
 		  int goodlep_index =0;
@@ -125,6 +130,7 @@ Bool_t TTbarAnalysis::Process(Long64_t entry)
 		  //Exactly one good lepton
 		  if(goodlep_n==1)
 		    {
+		      hist_cutflow_unw->Fill(4); hist_cutflow_w->Fill(4, weight); // cutflow 4: exactly one good lepton
 		      
 		      
 		      //Preselection of good jets
@@ -179,16 +185,19 @@ Bool_t TTbarAnalysis::Process(Long64_t entry)
 		      // At least four good jets
 		      if(goodjet_n >= 4)
 			{
+			  hist_cutflow_unw->Fill(5); hist_cutflow_w->Fill(5, weight); // cutflow 5: at least 4 good jets
 			  int goodjet1_index = goodjet_index[0]; // leading jet
 			  
 			  //At least two b-tagged jets
 			  if(goodbjet_n >= 2)
 			    {
+			      hist_cutflow_unw->Fill(6); hist_cutflow_w->Fill(6, weight); // cutflow 6: at least 2 b-tagged jets
 			      int goodbjet1_index = goodbjet_index[0]; // leading b-jet
 			      
 			      // MTW > 30 GeV
 			      if(mtw > 30000.)
 				{
+				  hist_cutflow_unw->Fill(7); hist_cutflow_w->Fill(7, weight); // cutflow 7: mTW > 30 GeV
 			
 				  
 				  // systematic variations on objects
