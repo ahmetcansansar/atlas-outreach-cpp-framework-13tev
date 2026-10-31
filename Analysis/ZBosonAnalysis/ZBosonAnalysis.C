@@ -73,10 +73,13 @@ Bool_t ZBosonAnalysis::Process(Long64_t entry)
       // Make difference between data and MC
       if(option.Contains("data")) {  weight = 1.; }
 
+      hist_cutflow_unw->Fill(0.); hist_cutflow_w->Fill(0., weight); // cutflow 0: all events
+
       
       //Preselection cut for electron/muon trigger
       if(trigE || trigM)
 	{
+	  hist_cutflow_unw->Fill(1); hist_cutflow_w->Fill(1, weight); // cutflow 1: trigger
 	  
 	  // Preselection of good leptons
 	  int goodlep_index[2];
@@ -118,6 +121,7 @@ Bool_t ZBosonAnalysis::Process(Long64_t entry)
 	  //exactly two good leptons
 	  if(goodlep_n==2)
 	    {
+	      hist_cutflow_unw->Fill(2); hist_cutflow_w->Fill(2, weight); // cutflow 2: exactly two good leptons
 	      
 	      int goodlep1_index = goodlep_index[0];
 	      int goodlep2_index = goodlep_index[1];
@@ -137,23 +141,27 @@ Bool_t ZBosonAnalysis::Process(Long64_t entry)
 	      //Leptons of opposite charge
 	      if(lep_charge->at(goodlep1_index) * lep_charge->at(goodlep2_index)  < 0)
 		{
+		  hist_cutflow_unw->Fill(3); hist_cutflow_w->Fill(3, weight); // cutflow 3: opposite charge
 		  // Leptons of same flavour
 		  int type_one = lep_type->at(goodlep1_index);
 		  int type_two = lep_type->at(goodlep2_index);
 		  if(TMath::Abs(type_one) == TMath::Abs(type_two))
 		    {
+		      hist_cutflow_unw->Fill(4); hist_cutflow_w->Fill(4, weight); // cutflow 4: same flavour
 		      float InvMass_Leptons_ee = 0.; if(type_one==11) InvMass_Leptons_ee = InvMass_Leptons;
 		      float InvMass_Leptons_mumu = 0.; if(type_one==13) InvMass_Leptons_mumu = InvMass_Leptons;
 		      
 		      // Invariant mass selection: m_ll - mZ < 25 GeV
 		      if( (TMath::Abs(InvMass_Leptons_ee - 91.18) < 25. ) || (TMath::Abs(InvMass_Leptons_mumu - 91.18) < 25. ) )
 			{
+			  hist_cutflow_unw->Fill(5); hist_cutflow_w->Fill(5, weight); // cutflow 5: |mll - mZ| < 25 GeV
 			  
 			  // By default, we are using for this analysis a MC sample known to describe poorly large jet multiplicity, thus we cut on nJets==0, lepton kinematics are well described in this phase-space 
 			  //    FillHistogramsLeadJet((double)jet_n, weight, "hist_n_jets");
 
         		if(jet_n==0)
 			{
+			  hist_cutflow_unw->Fill(6); hist_cutflow_w->Fill(6, weight); // cutflow 6: no jets
 	                 
                           if(type_one==11) FillHistogramsGlobal(InvMass_Leptons_ee , weight, "hist_ee_mLL");
                           if(type_one==13) FillHistogramsGlobal(InvMass_Leptons_mumu , weight, "hist_mumu_mLL");
