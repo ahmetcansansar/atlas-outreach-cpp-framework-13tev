@@ -72,17 +72,22 @@ Bool_t ZPrimeBoostedAnalysis::Process(Long64_t entry)
       // Make difference between data and MC
       if(option.Contains("data")) {  weight = 1.; }
 
+      hist_cutflow_unw->Fill(0.); hist_cutflow_w->Fill(0., weight); // cutflow 0: all events
+
       // cut inmediately on at least one large-R jet
       if (largeRjet_n >= 1)
 	{
+	  hist_cutflow_unw->Fill(1); hist_cutflow_w->Fill(1, weight); // cutflow 1: at least 1 large-R jet
 	  
 	  // MET > 20 GeV
 	  if(met_et > 20000.)
 	    {
+	      hist_cutflow_unw->Fill(2); hist_cutflow_w->Fill(2, weight); // cutflow 2: MET > 20 GeV
 	      
 	      // Preselection cut for electron/muon trigger, Good Run List, and good vertex
 	      if(trigE || trigM)
 		{
+		  hist_cutflow_unw->Fill(3); hist_cutflow_w->Fill(3, weight); // cutflow 3: electron or muon trigger
 		  
 		  // Preselection of good leptons
 		  int goodlep_index =0;
@@ -124,6 +129,7 @@ Bool_t ZPrimeBoostedAnalysis::Process(Long64_t entry)
 		  //Exactly one good lepton
 		  if(goodlep_n==1)
 		    {
+		      hist_cutflow_unw->Fill(4); hist_cutflow_w->Fill(4, weight); // cutflow 4: exactly one good lepton
 		      
                       TLorentzVector Lepton_1  = TLorentzVector();
                       Lepton_1.SetPtEtaPhiE(lep_pt->at(goodlep_index), lep_eta->at(goodlep_index), lep_phi->at(goodlep_index),lep_E->at(goodlep_index));
@@ -188,14 +194,17 @@ Bool_t ZPrimeBoostedAnalysis::Process(Long64_t entry)
                       // MET + mTW > 60 GeV
                       if( (met_et+mtw) > 60000.)
                         {
+                          hist_cutflow_unw->Fill(5); hist_cutflow_w->Fill(5, weight); // cutflow 5: MET + mTW > 60 GeV
 			  
 			  //At least one b-tagged jet
                           if(goodbjet_n >= 1)
                             {
+                              hist_cutflow_unw->Fill(6); hist_cutflow_w->Fill(6, weight); // cutflow 6: at least 1 b-tagged jet
 			     
 			      // events are required to contain at least one small-R jet
 			      if(goodjet_afterdRlep_n >= 1)
 				{
+				  hist_cutflow_unw->Fill(7); hist_cutflow_w->Fill(7, weight); // cutflow 7: at least 1 small-R jet with dR(lep,jet) < 2.0
 			
 				  int goodjet1_afterdRlep_index = goodjet_afterdRlep_index[0]; // jet identified with the expected b-jet from the leptonic top-quark decay, although no b-tagging requirement is enforced, highest pT is chosen
 
@@ -275,6 +284,7 @@ Bool_t ZPrimeBoostedAnalysis::Process(Long64_t entry)
 				  // require exactly one good TopLRjet_n
 				  if(TopLRjet_n == 1)
 				    {
+				      hist_cutflow_unw->Fill(8); hist_cutflow_w->Fill(8, weight); // cutflow 8: exactly 1 top-tagged large-R jet
 
 				      // In the ATLAS published analysis, the observable m_{reco}^{ttbar} is built. The four-momentum of the hadronic-top jet is used for the hadronic-top candidate. The leptonic-top candidate is constructed by summing the four-momenta of the charged lepton, the neutrino candidate, and the selected small-R jet. For that, the Z-component of the neutrino momentum is estimated by assuming that the neutrino and the lepton come from an on-shell W boson decay and imposing a W mass constraint on the neutrino–lepton system. We leave to the interested party this calculation [a possible reference is: ATLAS Collaboration, JHEP 08 (2015) 148]
 				      // Here, for simplicity, we are going to use the leptonic-top candidate without the neutrino
@@ -286,6 +296,7 @@ Bool_t ZPrimeBoostedAnalysis::Process(Long64_t entry)
 				      TLorentzVector TopLep_almost = TLorentzVector(); //  leptonic-top candidate
 				      // check that  the selected small-R jet is b-tagged
 				      if (jet_MV2c10->at(goodjet1_afterdRlep_index) >0.8244273 ) {
+					hist_cutflow_unw->Fill(9); hist_cutflow_w->Fill(9, weight); // cutflow 9: selected small-R jet is b-tagged
 					TopLep_almost = goodsmallRjet + Lepton_1;
 					TLorentzVector TTbar = TopHad + TopLep_almost; // Top-tagged Large-R jet + Small-R jet (b-tagged) + Lepton
 					FillHistogramsBoosted( TTbar.M()/1000., weight, "hist_ttbarMLR");
