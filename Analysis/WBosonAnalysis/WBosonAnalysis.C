@@ -45,6 +45,10 @@ void WBosonAnalysis::SlaveBegin(TTree * )
   define_histograms();
   
   FillOutputList();
+
+  // Event dump - addition for validation workflow
+  dump_csv.open("Output_WBosonAnalysis/" + option + ".csv");
+  dump_csv << "# runNumber, eventNumber, MET, MTW, pdgID(lep)" << std::endl;
 }
 
 Bool_t WBosonAnalysis::Process(Long64_t entry)
@@ -157,6 +161,12 @@ Bool_t WBosonAnalysis::Process(Long64_t entry)
 		  if(mtw > 60000.)
 		    {
 			  hist_cutflow_unw->Fill(4); hist_cutflow_w->Fill(4, weight); // cutflow 4: mtw > 60 GeV
+
+			  // Event dump - addition for validation workflow
+			  dump_csv << runNumber << " , " << (UInt_t)eventNumber
+			           << " , " << missingEt/1000.
+			           << " , " << mtw/1000.
+			           << " , " << -lep_charge->at(goodlep_index)*(int)lep_type->at(goodlep_index) << std::endl;
                      
 			  //Start to fill histograms : definitions of x-axis variables
 			  double names_of_global_variable[]={missingEt/1000., mtw/1000. , mtw_enu/1000., mtw_munu/1000.};
@@ -209,6 +219,7 @@ Bool_t WBosonAnalysis::Process(Long64_t entry)
 
 void WBosonAnalysis::SlaveTerminate()
 {
+  dump_csv.close(); // Event dump - addition for validation workflow
 }
 
 void WBosonAnalysis::Terminate()

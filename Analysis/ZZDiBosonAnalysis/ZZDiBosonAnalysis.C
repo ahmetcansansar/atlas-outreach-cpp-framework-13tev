@@ -41,6 +41,10 @@ void ZZDiBosonAnalysis::SlaveBegin(TTree * )
   define_histograms();
   
   FillOutputList();
+
+  // Event dump - addition for validation workflow
+  dump_csv.open("Output_ZZDiBosonAnalysis/" + option + ".csv");
+  dump_csv << "# runNumber, eventNumber, m(Z1), m(Z2), pdgID(lep1), pdgID(lep2), pdgID(lep3), pdgID(lep4)" << std::endl;
 }
 
 Bool_t ZZDiBosonAnalysis::Process(Long64_t entry)
@@ -261,6 +265,14 @@ Bool_t ZZDiBosonAnalysis::Process(Long64_t entry)
 		  if ( (sum_types == 44 || sum_types == 52 || sum_types == 48) && sum_ZZ_fin < 50 )
 		    {
 		      hist_cutflow_unw->Fill(6); hist_cutflow_w->Fill(6, weight); // cutflow 6: valid eeee/mumumumu/eemumu and sum of |m_ll - mZ| < 50 GeV
+
+		      // Event dump - addition for validation workflow (pdgID = -charge*type, as in CutLang)
+		      dump_csv << runNumber << " , " << (UInt_t)eventNumber
+		               << " , " << InvMassZ1_min << " , " << InvMassZ2_min
+		               << " , " << -lep_charge->at(goodlep1_index)*(int)lep_type->at(goodlep1_index)
+		               << " , " << -lep_charge->at(goodlep2_index)*(int)lep_type->at(goodlep2_index)
+		               << " , " << -lep_charge->at(goodlep3_index)*(int)lep_type->at(goodlep3_index)
+		               << " , " << -lep_charge->at(goodlep4_index)*(int)lep_type->at(goodlep4_index) << std::endl;
 		     		      
 		      TLorentzVector FourLepSystem = TLorentzVector();
 		      FourLepSystem = Lepton_1 + Lepton_2 + Lepton_3 + Lepton_4;
@@ -315,6 +327,7 @@ Bool_t ZZDiBosonAnalysis::Process(Long64_t entry)
 
 void ZZDiBosonAnalysis::SlaveTerminate()
 {
+  dump_csv.close(); // Event dump - addition for validation workflow
 }
 
 void ZZDiBosonAnalysis::Terminate()

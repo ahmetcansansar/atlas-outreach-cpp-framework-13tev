@@ -22,6 +22,7 @@
 #include <cstdlib>
 
 #include <TH1.h>
+#include <TSystem.h>
 #include <TH2.h>
 #include <TStyle.h>
 #include <TMath.h>
@@ -55,6 +56,14 @@ void SUSYAnalysis::SlaveBegin(TTree * )
   define_histograms(all_channels);
 
   FillOutputList(all_channels);
+
+  // Event dump - addition for validation workflow
+  gSystem->mkdir("Output_SUSYAnalysis/SR_loose", kTRUE);
+  gSystem->mkdir("Output_SUSYAnalysis/SR_tight", kTRUE);
+  dump_csv_loose.open("Output_SUSYAnalysis/SR_loose/" + option + ".csv");
+  dump_csv_tight.open("Output_SUSYAnalysis/SR_tight/" + option + ".csv");
+  dump_csv_loose << "# runNumber, eventNumber, m(ll), MT2, MET, |pdgID(lep)|" << std::endl;
+  dump_csv_tight << "# runNumber, eventNumber, m(ll), MT2, MET, |pdgID(lep)|" << std::endl;
 
 }
 
@@ -256,8 +265,9 @@ Bool_t SUSYAnalysis::Process(Long64_t entry)
     // Apply signal region definitions 
     if( n_light_jets_pt60 == 0 && n_bjets_pt20 == 0 ){ 
       hist_cutflow_unw->Fill(9); hist_cutflow_w->Fill(9, weight); // cutflow 9: jet veto (no light jets pT>60 GeV, no b-jets pT>20 GeV)
-      if( mLL > 111 && MT2 > 100 ){ current_channels.push_back("SR_loose"); hist_cutflow_unw->Fill(10); hist_cutflow_w->Fill(10, weight); /* cutflow 10: SR_loose, mLL > 111 GeV and MT2 > 100 GeV */ } 
-      if( mLL > 300 && MT2 > 130 ){ current_channels.push_back("SR_tight"); hist_cutflow_unw->Fill(11); hist_cutflow_w->Fill(11, weight); /* cutflow 11: SR_tight, mLL > 300 GeV and MT2 > 130 GeV */ } 
+      TString dump_row = Form("%d , %u , %g , %g , %g , %d", runNumber, (UInt_t)eventNumber, mLL, MT2, met.Et(), (int)lep_type->at(l1_i)); // Event dump - addition for validation workflow
+      if( mLL > 111 && MT2 > 100 ){ current_channels.push_back("SR_loose"); hist_cutflow_unw->Fill(10); hist_cutflow_w->Fill(10, weight); dump_csv_loose << dump_row << std::endl; /* cutflow 10: SR_loose, mLL > 111 GeV and MT2 > 100 GeV */ } 
+      if( mLL > 300 && MT2 > 130 ){ current_channels.push_back("SR_tight"); hist_cutflow_unw->Fill(11); hist_cutflow_w->Fill(11, weight); dump_csv_tight << dump_row << std::endl; /* cutflow 11: SR_tight, mLL > 300 GeV and MT2 > 130 GeV */ } 
     }
 
     //-----------------// 
@@ -299,6 +309,8 @@ Bool_t SUSYAnalysis::Process(Long64_t entry)
 
 void SUSYAnalysis::SlaveTerminate()
 {
+  dump_csv_loose.close(); // Event dump - addition for validation workflow
+  dump_csv_tight.close(); // Event dump - addition for validation workflow
 }
 
 void SUSYAnalysis::Terminate()

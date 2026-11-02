@@ -41,6 +41,10 @@ void ZBosonAnalysis::SlaveBegin(TTree * )
   define_histograms();
   
   FillOutputList();
+
+  // Event dump - addition for validation workflow
+  dump_csv.open("Output_ZBosonAnalysis/" + option + ".csv");
+  dump_csv << "# runNumber, eventNumber, m(ll), pdgID(lep1), pdgID(lep2)" << std::endl;
 }
 
 Bool_t ZBosonAnalysis::Process(Long64_t entry)
@@ -162,6 +166,12 @@ Bool_t ZBosonAnalysis::Process(Long64_t entry)
         		if(jet_n==0)
 			{
 			  hist_cutflow_unw->Fill(6); hist_cutflow_w->Fill(6, weight); // cutflow 6: no jets
+
+			  // Event dump - addition for validation workflow
+			  dump_csv << runNumber << " , " << (UInt_t)eventNumber
+			           << " , " << InvMass_Leptons
+			           << " , " << -lep_charge->at(goodlep1_index)*(int)lep_type->at(goodlep1_index)
+			           << " , " << -lep_charge->at(goodlep2_index)*(int)lep_type->at(goodlep2_index) << std::endl;
 	                 
                           if(type_one==11) FillHistogramsGlobal(InvMass_Leptons_ee , weight, "hist_ee_mLL");
                           if(type_one==13) FillHistogramsGlobal(InvMass_Leptons_mumu , weight, "hist_mumu_mLL");
@@ -208,6 +218,7 @@ Bool_t ZBosonAnalysis::Process(Long64_t entry)
 
 void ZBosonAnalysis::SlaveTerminate()
 {
+  dump_csv.close(); // Event dump - addition for validation workflow
 }
 
 void ZBosonAnalysis::Terminate()

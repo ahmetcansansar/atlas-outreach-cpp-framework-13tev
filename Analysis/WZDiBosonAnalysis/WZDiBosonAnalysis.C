@@ -41,6 +41,10 @@ void WZDiBosonAnalysis::SlaveBegin(TTree * )
   define_histograms();
   
   FillOutputList();
+
+  // Event dump - addition for validation workflow
+  dump_csv.open("Output_WZDiBosonAnalysis/" + option + ".csv");
+  dump_csv << "# runNumber, eventNumber, m(ll), MET, MTW, pdgID(lep1), pdgID(lep2), pdgID(lep3)" << std::endl;
 }
 
 Bool_t WZDiBosonAnalysis::Process(Long64_t entry)
@@ -251,6 +255,15 @@ Bool_t WZDiBosonAnalysis::Process(Long64_t entry)
 		  if( mtw > 30000. && met_et > 30000. && (lep_pt->at(goodlep1_index)/1000. > 25 || lep_pt->at(goodlep2_index)/1000. > 25 || lep_pt->at(goodlep3_index)/1000. > 25) )
 		  {
 		      hist_cutflow_unw->Fill(4); hist_cutflow_w->Fill(4, weight); // cutflow 4: mtw > 30 GeV, MET > 30 GeV, at least one lepton with pT > 25 GeV
+
+		      // Event dump - addition for validation workflow
+		      dump_csv << runNumber << " , " << (UInt_t)eventNumber
+		               << " , " << mll
+		               << " , " << met_et/1000.
+		               << " , " << mtw/1000.
+		               << " , " << -lep_charge->at(goodlep1_index)*(int)lep_type->at(goodlep1_index)
+		               << " , " << -lep_charge->at(goodlep2_index)*(int)lep_type->at(goodlep2_index)
+		               << " , " << -lep_charge->at(goodlep3_index)*(int)lep_type->at(goodlep3_index) << std::endl;
 		      
 		      //Start to fill histograms : definitions of x-axis variables
 		      
@@ -300,6 +313,7 @@ Bool_t WZDiBosonAnalysis::Process(Long64_t entry)
 
 void WZDiBosonAnalysis::SlaveTerminate()
 {
+  dump_csv.close(); // Event dump - addition for validation workflow
 }
 
 void WZDiBosonAnalysis::Terminate()

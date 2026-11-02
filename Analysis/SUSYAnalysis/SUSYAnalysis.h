@@ -16,6 +16,7 @@
 
 // Header file for the classes stored in the TTree if any.
 #include "vector"
+#include <fstream>
 
 class SUSYAnalysis : public TSelector {
 public :
@@ -29,6 +30,10 @@ public :
    // Cutflow - addition for validation workflow
    TH1D *hist_cutflow_unw = 0;
    TH1D *hist_cutflow_w   = 0;
+
+   // Event dump - addition for validation workflow
+   std::ofstream dump_csv_loose;
+   std::ofstream dump_csv_tight;
 
    map<TString, TH1*> hist_etmiss; //!	 
    map<TString, TH1*> hist_mLL; //!	 

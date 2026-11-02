@@ -45,6 +45,10 @@ void SingleTopAnalysis::SlaveBegin(TTree * )
   define_histograms();
   
   FillOutputList();
+
+  // Event dump - addition for validation workflow
+  dump_csv.open("Output_SingleTopAnalysis/" + option + ".csv");
+  dump_csv << "# runNumber, eventNumber, MET, MTW, HT, m(lb)" << std::endl;
 }
 
 Bool_t SingleTopAnalysis::Process(Long64_t entry)
@@ -231,6 +235,13 @@ Bool_t SingleTopAnalysis::Process(Long64_t entry)
 					  if (Mlb < 150)
 					    {	
 					      hist_cutflow_unw->Fill(10); hist_cutflow_w->Fill(10, weight); // cutflow 10: m(lb) < 150 GeV
+
+					      // Event dump - addition for validation workflow
+					      dump_csv << runNumber << " , " << (UInt_t)eventNumber
+					               << " , " << missingEt/1000.
+					               << " , " << mtw/1000.
+					               << " , " << HT
+					               << " , " << Mlb << std::endl;
 					      
 					      
 					      //Start to fill histograms : definitions of x-axis variables
@@ -286,6 +297,7 @@ Bool_t SingleTopAnalysis::Process(Long64_t entry)
 
 void SingleTopAnalysis::SlaveTerminate()
 {
+  dump_csv.close(); // Event dump - addition for validation workflow
 }
 
 void SingleTopAnalysis::Terminate()

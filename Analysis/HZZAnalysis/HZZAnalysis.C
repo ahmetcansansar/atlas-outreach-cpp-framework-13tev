@@ -41,6 +41,10 @@ void HZZAnalysis::SlaveBegin(TTree * )
   define_histograms();
   
   FillOutputList();
+
+  // Event dump - addition for validation workflow
+  dump_csv.open("Output_HZZAnalysis/" + option + ".csv");
+  dump_csv << "# runNumber, eventNumber, m(Z1), m(Z2), m(4l), pdgID(lep1), pdgID(lep2), pdgID(lep3), pdgID(lep4)" << std::endl;
 }
 
 Bool_t HZZAnalysis::Process(Long64_t entry)
@@ -240,6 +244,16 @@ Bool_t HZZAnalysis::Process(Long64_t entry)
 			  float FourLepSystem_M = FourLepSystem.Mag()/1000.;
 			  float FourLepSystem_pt = FourLepSystem.Pt()/1000.;
 			  float FourLepSystem_y = FourLepSystem.Rapidity();
+
+			  // Event dump - addition for validation workflow
+			  dump_csv << runNumber << " , " << (UInt_t)eventNumber
+			           << " , " << InvMassZ1_min
+			           << " , " << InvMassZ2_min
+			           << " , " << FourLepSystem_M
+			           << " , " << -lep_charge->at(goodlep1_index)*(int)lep_type->at(goodlep1_index)
+			           << " , " << -lep_charge->at(goodlep2_index)*(int)lep_type->at(goodlep2_index)
+			           << " , " << -lep_charge->at(goodlep3_index)*(int)lep_type->at(goodlep3_index)
+			           << " , " << -lep_charge->at(goodlep4_index)*(int)lep_type->at(goodlep4_index) << std::endl;
 			 
 
                           //Preselection of good jets
@@ -305,6 +319,7 @@ Bool_t HZZAnalysis::Process(Long64_t entry)
 
 void HZZAnalysis::SlaveTerminate()
 {
+  dump_csv.close(); // Event dump - addition for validation workflow
 }
 
 void HZZAnalysis::Terminate()

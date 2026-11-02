@@ -9,6 +9,7 @@
 #include "TH1.h"
 // Headers needed by this particular selector
 #include "vector"
+#include <fstream>
 
 class WZDiBosonAnalysis : public TSelector {
   public :
@@ -20,6 +21,9 @@ class WZDiBosonAnalysis : public TSelector {
   // Cutflow - addition for validation workflow
   TH1D *hist_cutflow_unw = 0;
   TH1D *hist_cutflow_w   = 0;
+
+  // Event dump - addition for validation workflow
+  std::ofstream dump_csv;
 
   // Global variables histograms
   TH1F *hist_etmiss      = 0;

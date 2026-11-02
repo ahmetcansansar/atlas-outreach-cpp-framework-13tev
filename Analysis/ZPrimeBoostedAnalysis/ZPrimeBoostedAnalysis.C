@@ -42,6 +42,10 @@ void ZPrimeBoostedAnalysis::SlaveBegin(TTree * )
   define_histograms();
   
   FillOutputList();
+
+  // Event dump - addition for validation workflow
+  dump_csv.open("Output_ZPrimeBoostedAnalysis/" + option + ".csv");
+  dump_csv << "# runNumber, eventNumber, MET, MTW, m(ttbar)" << std::endl;
 }
 
 Bool_t ZPrimeBoostedAnalysis::Process(Long64_t entry)
@@ -301,6 +305,12 @@ Bool_t ZPrimeBoostedAnalysis::Process(Long64_t entry)
 					TLorentzVector TTbar = TopHad + TopLep_almost; // Top-tagged Large-R jet + Small-R jet (b-tagged) + Lepton
 					FillHistogramsBoosted( TTbar.M()/1000., weight, "hist_ttbarMLR");
 
+					// Event dump - addition for validation workflow
+					dump_csv << runNumber << " , " << (UInt_t)eventNumber
+					         << " , " << met_et/1000.
+					         << " , " << mtw/1000.
+					         << " , " << TTbar.M()/1000. << std::endl;
+
 				      }
 				      
 				      // fill histograms	  
@@ -369,6 +379,7 @@ Bool_t ZPrimeBoostedAnalysis::Process(Long64_t entry)
 
 void ZPrimeBoostedAnalysis::SlaveTerminate()
 {
+  dump_csv.close(); // Event dump - addition for validation workflow
 }
 
 void ZPrimeBoostedAnalysis::Terminate()

@@ -42,6 +42,10 @@ void TTbarAnalysis::SlaveBegin(TTree * )
   define_histograms();
   
   FillOutputList();
+
+  // Event dump - addition for validation workflow
+  dump_csv.open("Output_TTbarAnalysis/" + option + ".csv");
+  dump_csv << "# runNumber, eventNumber, MET, MTW, n(jets), n(bjets)" << std::endl;
 }
 
 Bool_t TTbarAnalysis::Process(Long64_t entry)
@@ -198,6 +202,13 @@ Bool_t TTbarAnalysis::Process(Long64_t entry)
 			      if(mtw > 30000.)
 				{
 				  hist_cutflow_unw->Fill(7); hist_cutflow_w->Fill(7, weight); // cutflow 7: mTW > 30 GeV
+
+				  // Event dump - addition for validation workflow
+				  dump_csv << runNumber << " , " << (UInt_t)eventNumber
+				           << " , " << met_et/1000.
+				           << " , " << mtw/1000.
+				           << " , " << goodjet_n
+				           << " , " << goodbjet_n << std::endl;
 			
 				  
 				  // systematic variations on objects
@@ -340,6 +351,7 @@ Bool_t TTbarAnalysis::Process(Long64_t entry)
 
 void TTbarAnalysis::SlaveTerminate()
 {
+  dump_csv.close(); // Event dump - addition for validation workflow
 }
 
 void TTbarAnalysis::Terminate()

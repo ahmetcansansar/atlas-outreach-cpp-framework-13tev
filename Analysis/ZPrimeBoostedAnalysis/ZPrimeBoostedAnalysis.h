@@ -8,6 +8,7 @@
 #include "TSelector.h"
 #include "TH1.h"
 #include "vector"
+#include <fstream>
 
 class ZPrimeBoostedAnalysis : public TSelector {
   public :
@@ -19,6 +20,9 @@ class ZPrimeBoostedAnalysis : public TSelector {
   // Cutflow - addition for validation workflow
   TH1D *hist_cutflow_unw = 0;
   TH1D *hist_cutflow_w   = 0;
+
+  // Event dump - addition for validation workflow
+  std::ofstream dump_csv;
 
   // Global variables histograms
   TH1F *hist_etmiss       = 0;
